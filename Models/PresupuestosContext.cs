@@ -13,6 +13,28 @@ namespace AppPresupuestosSockets.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Usuarios>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Presupuestos>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Presupuestos>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+            });
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Transacciones>()

@@ -1,8 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<AppPresupuestosSockets.Models.Presupuestos>
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    @foreach (var presupuesto in Model)
+    {
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@presupuesto.Nombre</h5>
+                    <p class="card-text">@presupuesto.Descripcion</p>
+                    <a asp-action="VerDetalle" asp-route-id="@presupuesto.Id" class="btn btn-primary">Ir al presupuesto</a>
+                </div>
+            </div>
+        </div>
+    }
 </div>

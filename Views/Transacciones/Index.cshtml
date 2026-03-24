@@ -1,0 +1,49 @@
+@model AppPresupuestosSockets.Models.CrearTransaccionViewModel
+
+<h2>Crear Nueva Transacción</h2>
+
+<form asp-action="GuardarTransaccion" method="post">
+    <div class="mb-3">
+        <label asp-for="NuevaTransaccion.Descripcion" class="form-label">Descripción</label>
+        <input asp-for="NuevaTransaccion.Descripcion" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NuevaTransaccion.Monto" class="form-label">Monto</label>
+        <input asp-for="NuevaTransaccion.Monto" type="number" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NuevaTransaccion.Categoria" class="form-label">Categoría</label>
+        <input asp-for="NuevaTransaccion.Categoria" type="text" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NuevaTransaccion.ColorHex" class="form-label">Agregar color</label>
+        <input asp-for="NuevaTransaccion.ColorHex" type="color" class="form-control form-control-color" title="Choose a color">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Asignar a Presupuesto</label>
+        <select asp-for="NuevaTransaccion.PresupuestoId" class="form-select">
+            <option value="">-- Selecciona un responsable --</option>
+            @foreach (var presupuesto in Model.ListaPresupuestos)
+            {
+                <option value="@presupuesto.Id">@presupuesto.Nombre</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Asignar a Usuario</label>
+        <select asp-for="NuevaTransaccion.UsuarioId" class="form-select">
+            <option value="">-- Selecciona un responsable --</option>
+            @foreach (var usuario in Model.ListaUsuarios)
+            {
+                <option value="@usuario.Id">@usuario.Nombre</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Crear y Notificar</button>
+</form>

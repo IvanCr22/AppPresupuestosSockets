@@ -9,6 +9,7 @@ namespace AppPresupuestosSockets.Models
     {
         public int Id { get; set; }
         public string Nombre { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
         public decimal MontoTotal { get; set; }
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
         public int UsuarioId { get; set; }

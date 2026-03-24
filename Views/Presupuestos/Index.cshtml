@@ -1,0 +1,37 @@
+@model AppPresupuestosSockets.Models.CrearPresupuestoViewModel
+
+<h2>Crear Nuevo Presupuesto</h2>
+
+<form asp-action="GuardarPresupuesto" method="post">
+    <div class="mb-3">
+        <label asp-for="NuevoPresupuesto.Nombre" class="form-label">Nombre</label>
+        <input asp-for="NuevoPresupuesto.Nombre" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="NuevoPresupuesto.Descripcion" class="form-label">Descripción</label>
+        <input asp-for="NuevoPresupuesto.Descripcion" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NuevoPresupuesto.MontoTotal" class="form-label">Presupuesto Inicial</label>
+        <input asp-for="NuevoPresupuesto.MontoTotal" type="number" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NuevoPresupuesto.FechaCreacion" class="form-label">Fecha de Creación</label>
+        <input asp-for="NuevoPresupuesto.FechaCreacion" type="date" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Asignar a Usuario</label>
+        <select asp-for="NuevoPresupuesto.UsuarioId" class="form-select">
+            <option value="">-- Selecciona un responsable --</option>
+            @foreach (var usuario in Model.ListaUsuarios)
+            {
+                <option value="@usuario.Id">@usuario.Nombre</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Crear y Notificar</button>
+</form>

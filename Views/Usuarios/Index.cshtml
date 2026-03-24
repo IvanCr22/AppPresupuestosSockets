@@ -1,0 +1,20 @@
+@model AppPresupuestosSockets.Models.Usuarios
+
+<form asp-action="Agregar" method="post">
+    <div class="row">
+        <div class="col-4">
+            <label asp-for="Nombre"></label>
+            <input type="text" asp-for="Nombre" class="form-control">
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-4">
+            <label asp-for="Email"></label>
+            <input type="text" asp-for="Email" class="form-control">
+        </div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Enviar</button>
+        <a asp-action="Index" class="btn btn-secondary">Regresar</a>
+    </div>
+</form>
