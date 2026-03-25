@@ -8,10 +8,18 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Pass@12345
       - MSSQL_PID=Developer
+      # LIMITACIÓN INTERNA: Le dice a SQL Server que no use más de 2GB para su caché
+      - MSSQL_MEMORY_LIMIT_MB=2048 
+    deploy:
+      resources:
+        limits:
+          # LIMITACIÓN EXTERNA: El tope máximo que el contenedor puede tocar
+          memory: 2500M
     volumes:
       - sql_data:/var/opt/mssql
     networks:
       - budget_network
+    restart: always
 
 volumes:
   sql_data:

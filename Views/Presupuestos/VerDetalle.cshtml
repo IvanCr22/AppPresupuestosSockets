@@ -1,0 +1,62 @@
+@model AppPresupuestosSockets.Models.Presupuestos
+
+<div>
+    <h1>@Model.Nombre</h1>
+    <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+        <div class="card-header bg-primary text-white">
+            Distribución de Gastos
+        </div>
+        <div class="card-body">
+            <canvas id="miGraficaDePrueba" style="max-height: 400px;"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Usamos el ID que viene de tu base de datos (Modelo C#)
+        const presupuestoId = @Model.Id;
+
+        async function inicializarGrafica() {
+            try {
+                // Llamamos a la acción del controlador que creamos en el paso anterior
+                const response = await fetch(`/Presupuestos/ObtenerDatosGrafica/${presupuestoId}`);
+                const datos = await response.json();
+
+                if (datos.labels.length === 0) {
+                    console.warn("No hay transacciones para este presupuesto.");
+                    return;
+                }
+
+                const ctx = document.getElementById('miGraficaDePrueba').getContext('2d');
+                
+                // Creamos la instancia de la gráfica
+                window.myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: datos.labels,
+                        datasets: [{
+                            data: datos.cantidades,
+                            backgroundColor: datos.colores, // Usamos tu columna ColorHex
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error al cargar los datos de la gráfica:", error);
+            }
+        }
+
+        // Ejecutar la función cuando el DOM esté listo
+        document.addEventListener("DOMContentLoaded", inicializarGrafica);
+    </script>
+}

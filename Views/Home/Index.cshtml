@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <h5 class="card-title">@presupuesto.Nombre</h5>
                     <p class="card-text">@presupuesto.Descripcion</p>
-                    <a asp-action="VerDetalle" asp-route-id="@presupuesto.Id" class="btn btn-primary">Ir al presupuesto</a>
+                    <a asp-controller="Presupuestos" asp-action="VerDetalle" asp-route-id="@presupuesto.Id" class="btn btn-primary">Ir al presupuesto</a>
                 </div>
             </div>
         </div>

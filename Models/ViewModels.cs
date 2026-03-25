@@ -18,4 +18,11 @@ namespace AppPresupuestosSockets.Models
         public List<Presupuestos> ListaPresupuestos { get; set; } = new List<Presupuestos>();
         public List<Usuarios> ListaUsuarios { get; set; } = new List<Usuarios>();
     }
+
+    public class ChartDataViewModel
+    {
+        public List<string> Labels { get; set; } = new();
+        public List<decimal> Cantidades { get; set; } = new();
+        public List<string> Colores { get; set; } = new();
+    }
 }
