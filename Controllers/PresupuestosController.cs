@@ -1,6 +1,7 @@
 using AppPresupuestosSockets.Models;
 using AppPresupuestosSockets.Service;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppPresupuestosSockets.Controllers
@@ -10,10 +11,13 @@ namespace AppPresupuestosSockets.Controllers
         private readonly PresupuestosContext _db;
         private readonly IChart _chartService;
 
-        public PresupuestosController(PresupuestosContext db, IChart chartService)
+        private readonly IHubContext<PresupuestoHub> _hubContext;
+
+        public PresupuestosController(PresupuestosContext db, IChart chartService, IHubContext<PresupuestoHub> hubContext)
         {
             _db = db;
             _chartService = chartService;
+            _hubContext = hubContext;
         }
         
         [HttpGet]
@@ -35,18 +39,22 @@ namespace AppPresupuestosSockets.Controllers
         [HttpGet]
         public async Task<IActionResult> VerDetalle(string id)
         {
-            Presupuestos? presupuesto = await _db.Presupuestos.FirstOrDefaultAsync(x => x.Id == int.Parse(id));
-            if (presupuesto == null) return NotFound();
-            return View(presupuesto);
+            var datosGrafica = await _chartService.GetInformacionChart(int.Parse(id));
+            return View(datosGrafica);
         }
 
-        [HttpGet]
-    public async Task<IActionResult> ObtenerDatosGrafica(int id)
-    {
-        var data = await _chartService.GetInformacionChart(id);
-        if (data == null) return NotFound();
-        
-        return Json(data);
-    }
+        [HttpPost]
+        [Route("Transacciones/Eliminar/{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var transaccion = await _chartService.EliminarTransaccion(id);
+
+            if (transaccion == null) return NotFound();
+
+            await _hubContext.Clients.Group(transaccion.PresupuestoId.ToString())
+                .SendAsync("EliminarGrafica", new { id = id, monto = transaccion.Monto, categoria = transaccion.Categoria });
+
+            return Ok();
+        }
     }
 }

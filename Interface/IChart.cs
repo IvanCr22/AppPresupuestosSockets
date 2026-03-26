@@ -9,5 +9,7 @@ namespace AppPresupuestosSockets.Service
     public interface IChart
     {
         Task<ChartDataViewModel> GetInformacionChart(int presupuestoId);
+
+        Task<Transacciones?> EliminarTransaccion(int transaccionId);
     }
 }

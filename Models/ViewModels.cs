@@ -24,5 +24,9 @@ namespace AppPresupuestosSockets.Models
         public List<string> Labels { get; set; } = new();
         public List<decimal> Cantidades { get; set; } = new();
         public List<string> Colores { get; set; } = new();
+
+        public List<Transacciones> Historial { get; set; } = new();
+
+        public Presupuestos? Presupuesto { get; set; } = new Presupuestos();
     }
 }

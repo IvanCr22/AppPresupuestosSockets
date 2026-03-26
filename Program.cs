@@ -9,6 +9,7 @@ builder.Services.AddScoped<IChart, ChartService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<PresupuestosContext>(context => context.UseSqlServer("name=ConnectionStrings:conexion"));
 
+builder.Services.AddSignalR();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,6 +20,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.MapHub<PresupuestoHub>("/presupuestoHub");
 app.UseHttpsRedirection();
 app.UseRouting();
 

@@ -15,6 +15,8 @@ namespace AppPresupuestosSockets.Models
         public DateTime Fecha { get; set; } = DateTime.Now;
 
         public int PresupuestoId { get; set; }
+        
+        [System.Text.Json.Serialization.JsonIgnore]
         public Presupuestos Presupuesto { get; set; } = null!;
 
         public int UsuarioId { get; set; }

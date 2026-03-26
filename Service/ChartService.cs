@@ -16,6 +16,21 @@ namespace AppPresupuestosSockets.Service
             _db = db;
         }
 
+        public async Task<Transacciones?> EliminarTransaccion(int transaccionId)
+        {
+            var transaccion = await _db.Transacciones.FirstOrDefaultAsync(x => x.Id == transaccionId);
+
+            if (transaccion != null)
+            {
+                _db.Transacciones.Remove(transaccion);
+                await _db.SaveChangesAsync();
+
+                return transaccion;
+            }
+
+            return null;
+        }
+
         public async Task<ChartDataViewModel> GetInformacionChart(int presupuestoId)
         {
             var presupuesto = await _db.Presupuestos.FindAsync(presupuestoId);
@@ -41,23 +56,27 @@ namespace AppPresupuestosSockets.Service
             {
                 Labels = dataAgrupada.Select(x => x.Categoria).ToList(),
                 Cantidades = dataAgrupada.Select(x => x.Total).ToList(),
-                Colores = dataAgrupada.Select(x => x.Color).ToList()
+                Colores = dataAgrupada.Select(x => x.Color).ToList(),
+                Historial = transacciones.OrderByDescending(t => t.Fecha).ToList(),
+                Presupuesto = presupuesto
             };
 
             if (saldoRestante > 0)
             {
                 viewModel.Labels.Add("Disponible");
                 viewModel.Cantidades.Add(saldoRestante);
-                viewModel.Colores.Add("#2ecc71"); // Verde
+                viewModel.Colores.Add("#2ecc71");
             }
             else if (saldoRestante < 0)
             {
                 viewModel.Labels.Add("Excedido");
                 viewModel.Cantidades.Add(Math.Abs(saldoRestante));
-                viewModel.Colores.Add("#e74c3c"); // Rojo
+                viewModel.Colores.Add("#e74c3c");
             }
 
             return viewModel;
         }
+
+        
     }
 }

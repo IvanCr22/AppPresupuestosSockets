@@ -1,62 +1,207 @@
-@model AppPresupuestosSockets.Models.Presupuestos
+@model AppPresupuestosSockets.Models.ChartDataViewModel
 
-<div>
-    <h1>@Model.Nombre</h1>
-    <div class="card shadow-sm p-3 mb-5 bg-white rounded">
-        <div class="card-header bg-primary text-white">
-            Distribución de Gastos
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-pie-chart-fill me-2"></i>Distribución de Gastos
+                </div>
+                <div class="card-body">
+                    <div style="position: relative; height:400px;">
+                        <canvas id="miGraficaDePrueba"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <canvas id="miGraficaDePrueba" style="max-height: 400px;"></canvas>
+
+        <div class="col-md-6">
+            <h4 class="mb-3">Historial de Gastos</h4>
+            <div class="list-group shadow-sm" style="max-height: 500px; overflow-y: auto;">
+                <div id="contenedorTransacciones">
+                    @foreach (var gasto in Model.Historial)
+                    {
+                        <div class="list-group-item bg-primary text-white mb-2 shadow-sm" data-id="@gasto.Id">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <h5 class="mb-1">@gasto.Categoria</h5>
+                                <button type="button" 
+                                        class="btn btn-danger btn-sm shadow-sm"
+                                        onclick="ejecutarEliminacion(event, @gasto.Id)">
+                                    X
+                                </button>
+                            </div>
+                            <p class="mb-1">@gasto.Descripcion</p>
+                            <div class="d-flex justify-content-between">
+                                <small>@gasto.Fecha.ToString("dd/MM/yyyy")</small>
+                                <small>@gasto.Monto.ToString("C")</small> 
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/9.0.6/signalr.min.js"></script>
 
     <script>
-        // Usamos el ID que viene de tu base de datos (Modelo C#)
-        const presupuestoId = @Model.Id;
+        let datosApp = @Html.Raw(Json.Serialize(Model));
+        let myChartInstance = null;
 
-        async function inicializarGrafica() {
+        function renderizarGrafica() {
             try {
-                // Llamamos a la acción del controlador que creamos en el paso anterior
-                const response = await fetch(`/Presupuestos/ObtenerDatosGrafica/${presupuestoId}`);
-                const datos = await response.json();
+                const ctx = document.getElementById('miGraficaDePrueba').getContext('2d');
 
-                if (datos.labels.length === 0) {
-                    console.warn("No hay transacciones para este presupuesto.");
-                    return;
+                if (myChartInstance) {
+                    myChartInstance.destroy();
                 }
 
-                const ctx = document.getElementById('miGraficaDePrueba').getContext('2d');
-                
-                // Creamos la instancia de la gráfica
-                window.myChart = new Chart(ctx, {
+                if (!datosApp.labels || datosApp.labels.length === 0) return;
+
+                myChartInstance = new Chart(ctx, {
                     type: 'pie',
                     data: {
-                        labels: datos.labels,
+                        labels: datosApp.labels,
                         datasets: [{
-                            data: datos.cantidades,
-                            backgroundColor: datos.colores, // Usamos tu columna ColorHex
+                            data: datosApp.cantidades,
+                            backgroundColor: datosApp.colores,
                             borderWidth: 1
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom' }
-                        }
+                        plugins: { legend: { position: 'bottom' } }
                     }
                 });
             } catch (error) {
-                console.error("Error al cargar los datos de la gráfica:", error);
+                console.error("Error al renderizar el gráfico:", error);
             }
         }
 
-        // Ejecutar la función cuando el DOM esté listo
-        document.addEventListener("DOMContentLoaded", inicializarGrafica);
+
+        function agregarGastoAListaVisual(t) {
+            console.log("Agregando nuevo gasto a la lista visual:", t);
+            const contenedor = document.getElementById("contenedorTransacciones");
+
+
+            const fecha = new Date(t.fecha);
+            const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            const nuevoHTML = `
+                <a class="list-group-item bg-primary text-white mb-2" aria-current="true">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">${t.categoria}</h5>
+                            <form asp-action="Eliminar" asp-route-id="${t.id}" method="post" 
+                                onsubmit="return confirm('¿Seguro que quieres eliminar este gasto?')">
+                                <button type="submit" class="btn btn-danger btn-sm shadow-sm">
+                                    X
+                                </button>
+                            </form>
+                        </div>
+                        <p class="mb-1">${t.descripcion || ''}</p>
+                        
+                        <div class="d-flex justify-content-between">
+                                <small>${fechaFormateada}</small>
+                                <small>$${t.monto.toFixed(2)}</small> 
+                            </div>
+                    </a>
+            `;
+            contenedor.insertAdjacentHTML('afterbegin', nuevoHTML);
+        }
+
+        async function ejecutarEliminacion(event, id) {
+            console.log("Iniciando eliminación para ID:", id);
+            event.stopPropagation();
+
+            try {
+                const response = await fetch(`/Transacciones/Eliminar/${id}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    console.log("Petición enviada");
+                } else {
+                    console.error("Error al eliminar");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        const conexion = new signalR.HubConnectionBuilder()
+            .withUrl("/presupuestoHub")
+            .build();
+
+        conexion.on("ActualizarGrafica", (transaccion) => {
+            const t = transaccion.nuevaTransaccion;
+            console.log("Procesando nueva transacción:", t);
+
+            if (!datosApp.historial) datosApp.historial = [];
+            datosApp.historial.unshift(t);
+
+            const indiceDisponible = datosApp.labels.indexOf("Disponible");
+            if (indiceDisponible !== -1) {
+                datosApp.cantidades[indiceDisponible] -= t.monto;
+                if (datosApp.cantidades[indiceDisponible] < 0) datosApp.cantidades[indiceDisponible] = 0;
+            }
+
+            const indiceCategoria = datosApp.labels.indexOf(t.categoria);
+            datosApp.cantidades[indiceCategoria] += t.monto;
+            datosApp.labels.push(t.categoria);
+            datosApp.cantidades.push(t.monto);
+            datosApp.colores.push(t.colorHex);
+
+            console.log("Estado final de datosApp:", datosApp);
+            renderizarGrafica();
+            agregarGastoAListaVisual(t);
+            
+        });
+
+        conexion.on("EliminarGrafica", (datosEliminados) => {
+            console.log("Transacción eliminada recibida:", datosEliminados);
+
+            const elemento = document.querySelector(`[data-id="${datosEliminados.id}"]`);
+            if (elemento) {
+                elemento.classList.add('animate__fadeOutRight');
+                setTimeout(() => elemento.remove(), 500);
+            }
+
+            const indiceDisponible = datosApp.labels.indexOf("Disponible");
+            if (indiceDisponible !== -1) {
+                datosApp.cantidades[indiceDisponible] += datosEliminados.monto;
+            }
+
+            const indiceCat = datosApp.labels.indexOf(datosEliminados.categoria);
+            if (indiceCat !== -1) {
+                datosApp.cantidades[indiceCat] -= datosEliminados.monto;
+            }
+
+            renderizarGrafica();
+        });
+
+        conexion.start()
+            .then(() => {
+                console.log("Presupuesto ID para unirse al grupo:", datosApp.presupuesto),
+                console.log("Conectado a SignalR")
+
+                conexion.invoke("UnirseAlPresupuesto", "" + datosApp.presupuesto.id)
+                .then(() => console.log(`Suscrito al presupuesto #${"" + datosApp.presupuesto.id}`))
+                .catch(err => console.error("Error al unirse al grupo:", err));
+            }
+                
+            )
+            .catch(err => console.error("Error SignalR:", err));
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderizarGrafica();
+        });
     </script>
 }
