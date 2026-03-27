@@ -33,9 +33,14 @@ namespace AppPresupuestosSockets.Controllers
         [HttpPost]
         public async Task<IActionResult> Agregar(Usuarios usuario)
         {
+            if (!ModelState.IsValid)
+            {
+                return View("Index", usuario);
+            }
+
             await _db.Usuarios.AddAsync(usuario);
             await _db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Home");
         }
 
     }

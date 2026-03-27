@@ -6,20 +6,24 @@
     <div class="mb-3">
         <label asp-for="NuevoPresupuesto.Nombre" class="form-label">Nombre</label>
         <input asp-for="NuevoPresupuesto.Nombre" class="form-control" />
+        <span asp-validation-for="NuevoPresupuesto.Nombre" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="NuevoPresupuesto.Descripcion" class="form-label">Descripción</label>
         <input asp-for="NuevoPresupuesto.Descripcion" class="form-control" />
+        <span asp-validation-for="NuevoPresupuesto.Descripcion" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="NuevoPresupuesto.MontoTotal" class="form-label">Presupuesto Inicial</label>
         <input asp-for="NuevoPresupuesto.MontoTotal" type="number" class="form-control" />
+        <span asp-validation-for="NuevoPresupuesto.MontoTotal" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="NuevoPresupuesto.FechaCreacion" class="form-label">Fecha de Creación</label>
         <input asp-for="NuevoPresupuesto.FechaCreacion" type="date" class="form-control" />
+        <span asp-validation-for="NuevoPresupuesto.FechaCreacion" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
@@ -31,7 +35,11 @@
                 <option value="@usuario.Id">@usuario.Nombre</option>
             }
         </select>
+        <span asp-validation-for="NuevoPresupuesto.UsuarioId" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-success">Crear y Notificar</button>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-danger">
+            <i class="bi bi-plus-circle"></i> Regresar
+    </a>
 </form>

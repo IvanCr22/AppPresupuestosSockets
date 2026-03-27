@@ -5,16 +5,20 @@
         <div class="col-4">
             <label asp-for="Nombre"></label>
             <input type="text" asp-for="Nombre" class="form-control">
+            <span asp-validation-for="Nombre" class="text-danger"></span>
         </div>
     </div>
     <div class="row mt-4">
         <div class="col-4">
             <label asp-for="Email"></label>
             <input type="text" asp-for="Email" class="form-control">
+            <span asp-validation-for="Nombre" class="text-danger"></span>
         </div>
     </div>
     <div class="mt-4">
         <button type="submit" class="btn btn-primary">Enviar</button>
-        <a asp-action="Index" class="btn btn-secondary">Regresar</a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-danger">
+            <i class="bi bi-plus-circle"></i> Regresar
+    </a>
     </div>
 </form>

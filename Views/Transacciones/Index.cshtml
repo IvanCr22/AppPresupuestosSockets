@@ -6,33 +6,27 @@
     <div class="mb-3">
         <label asp-for="NuevaTransaccion.Descripcion" class="form-label">Descripción</label>
         <input asp-for="NuevaTransaccion.Descripcion" class="form-control" />
+        <span asp-validation-for="NuevaTransaccion.Descripcion" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="NuevaTransaccion.Monto" class="form-label">Monto</label>
         <input asp-for="NuevaTransaccion.Monto" type="number" class="form-control" />
+        <span asp-validation-for="NuevaTransaccion.Monto" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="NuevaTransaccion.Categoria" class="form-label">Categoría</label>
         <input asp-for="NuevaTransaccion.Categoria" type="text" class="form-control" />
+        <span asp-validation-for="NuevaTransaccion.Categoria" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="NuevaTransaccion.ColorHex" class="form-label">Agregar color</label>
         <input asp-for="NuevaTransaccion.ColorHex" type="color" class="form-control form-control-color" title="Choose a color">
+        <span asp-validation-for="NuevaTransaccion.ColorHex" class="text-danger"></span>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Asignar a Presupuesto</label>
-        <select asp-for="NuevaTransaccion.PresupuestoId" class="form-select">
-            <option value="">-- Selecciona un responsable --</option>
-            @foreach (var presupuesto in Model.ListaPresupuestos)
-            {
-                <option value="@presupuesto.Id">@presupuesto.Nombre</option>
-            }
-        </select>
-    </div>
+    <input asp-for="NuevaTransaccion.PresupuestoId" type="hidden" value="@ViewBag.PresupuestoId" />
 
     <div class="mb-3">
         <label class="form-label">Asignar a Usuario</label>
@@ -45,5 +39,8 @@
         </select>
     </div>
 
-    <button type="submit" class="btn btn-success">Crear y Notificar</button>
+    <button type="submit" class="btn btn-success">Crear</button>
+    <a asp-controller="Presupuestos" asp-action="VerDetalle" class="btn btn-danger" asp-route-id="@ViewBag.PresupuestoId"> 
+            <i class="bi bi-plus-circle"></i> Regresar
+    </a>
 </form>

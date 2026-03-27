@@ -23,8 +23,9 @@ namespace AppPresupuestosSockets.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id)
         {
+            ViewBag.PresupuestoId = id;
             var modelo = new CrearTransaccionViewModel();
             modelo.ListaPresupuestos = await _db.Presupuestos.ToListAsync();
             modelo.ListaUsuarios = await _db.Usuarios.ToListAsync();
@@ -34,12 +35,19 @@ namespace AppPresupuestosSockets.Controllers
         [HttpPost]
         public async Task<IActionResult> GuardarTransaccion(CrearTransaccionViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                viewModel.ListaPresupuestos = await _db.Presupuestos.ToListAsync();
+                viewModel.ListaUsuarios = await _db.Usuarios.ToListAsync();
+                return View("Index", viewModel);
+            }
             await _db.Transacciones.AddAsync(viewModel.NuevaTransaccion);
             await _db.SaveChangesAsync();
             //await _hubContext.Clients.All.SendAsync("ActualizarGrafica", viewModel);
             string nombreGrupo = viewModel.NuevaTransaccion.PresupuestoId.ToString();
             await _hubContext.Clients.Group(nombreGrupo).SendAsync("ActualizarGrafica", viewModel);
-            return RedirectToAction("Index");
+            //return RedirectToAction("Presupuestos", "VerDetalle", viewModel.NuevaTransaccion.PresupuestoId);
+            return RedirectToAction("VerDetalle", "Presupuestos", new { id = viewModel.NuevaTransaccion.PresupuestoId });
         }
         
     }

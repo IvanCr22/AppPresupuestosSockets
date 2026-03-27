@@ -31,9 +31,15 @@ namespace AppPresupuestosSockets.Controllers
         [HttpPost]
         public async Task<IActionResult> GuardarPresupuesto(CrearPresupuestoViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                viewModel.ListaUsuarios = await _db.Usuarios.ToListAsync(); 
+                return View("Index", viewModel);
+            }
+            
             await _db.Presupuestos.AddAsync(viewModel.NuevoPresupuesto);
             await _db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
