@@ -21,14 +21,6 @@ public class HomeController : Controller
         return View(presupuestos);
     }
 
-    /* [HttpGet]
-    public async Task<IActionResult> VerDetalle(string id)
-    {
-        Presupuestos? presupuesto = await _db.Presupuestos.FirstOrDefaultAsync(x => x.Id == int.Parse(id));
-        if (presupuesto == null ) return NotFound();
-        return View(presupuesto);
-    } */
-
     public IActionResult Privacy()
     {
         return View();

@@ -10,7 +10,6 @@ namespace AppPresupuestosSockets.Controllers
     {
         private readonly PresupuestosContext _db;
         private readonly IChart _chartService;
-
         private readonly IHubContext<PresupuestoHub> _hubContext;
 
         public PresupuestosController(PresupuestosContext db, IChart chartService, IHubContext<PresupuestoHub> hubContext)

@@ -53,6 +53,7 @@
     <script>
         let datosApp = @Html.Raw(Json.Serialize(Model));
         let myChartInstance = null;
+        const conexion = new signalR.HubConnectionBuilder().withUrl("/presupuestoHub").build();
 
         function renderizarGrafica() {
             try {
@@ -99,7 +100,7 @@
             });
 
             const nuevoHTML = `
-                <a class="list-group-item bg-primary text-white mb-2" aria-current="true">
+                <a class="list-group-item text-white mb-2" aria-current="true" style="background-color: ${t.colorHex};">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">${t.categoria}</h5>
                             <form asp-action="Eliminar" asp-route-id="${t.id}" method="post" 
@@ -139,10 +140,7 @@
             }
         }
 
-        const conexion = new signalR.HubConnectionBuilder()
-            .withUrl("/presupuestoHub")
-            .build();
-
+        
         conexion.on("ActualizarGrafica", (transaccion) => {
             const t = transaccion.nuevaTransaccion;
             console.log("Procesando nueva transacción:", t);
@@ -171,20 +169,25 @@
         conexion.on("EliminarGrafica", (datosEliminados) => {
             console.log("Transacción eliminada recibida:", datosEliminados);
 
+            // Eliminar elemetos de la lista
             const elemento = document.querySelector(`[data-id="${datosEliminados.id}"]`);
             if (elemento) {
-                elemento.classList.add('animate__fadeOutRight');
-                setTimeout(() => elemento.remove(), 500);
+                elemento.remove()
             }
-
+            // Restar cantidad al saldo disponible
             const indiceDisponible = datosApp.labels.indexOf("Disponible");
-            if (indiceDisponible !== -1) {
-                datosApp.cantidades[indiceDisponible] += datosEliminados.monto;
-            }
+            if (indiceDisponible !== -1) datosApp.cantidades[indiceDisponible] += datosEliminados.monto;
 
+            // Restar o eliminar la categoria
             const indiceCat = datosApp.labels.indexOf(datosEliminados.categoria);
             if (indiceCat !== -1) {
                 datosApp.cantidades[indiceCat] -= datosEliminados.monto;
+
+                if (datosApp.cantidades[indiceCat] <= 0) {
+                    datosApp.labels.splice(indiceCat, 1);
+                    datosApp.cantidades.splice(indiceCat, 1);
+                    datosApp.colores.splice(indiceCat, 1);
+                }
             }
 
             renderizarGrafica();
@@ -192,16 +195,12 @@
 
         conexion.start()
             .then(() => {
-                console.log("Presupuesto ID para unirse al grupo:", datosApp.presupuesto),
-                console.log("Conectado a SignalR")
-
                 conexion.invoke("UnirseAlPresupuesto", "" + datosApp.presupuesto.id)
-                .then(() => console.log(`Suscrito al presupuesto #${"" + datosApp.presupuesto.id}`))
+                .then(() => console.log(`Suscrito al presupuesto ${"" + datosApp.presupuesto.id}`))
                 .catch(err => console.error("Error al unirse al grupo:", err));
             }
                 
-            )
-            .catch(err => console.error("Error SignalR:", err));
+        ).catch(err => console.error("Error SignalR:", err));
 
         document.addEventListener("DOMContentLoaded", () => {
             renderizarGrafica();

@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using AppPresupuestosSockets.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace AppPresupuestosSockets.Controllers
 {
@@ -43,10 +37,8 @@ namespace AppPresupuestosSockets.Controllers
             }
             await _db.Transacciones.AddAsync(viewModel.NuevaTransaccion);
             await _db.SaveChangesAsync();
-            //await _hubContext.Clients.All.SendAsync("ActualizarGrafica", viewModel);
             string nombreGrupo = viewModel.NuevaTransaccion.PresupuestoId.ToString();
             await _hubContext.Clients.Group(nombreGrupo).SendAsync("ActualizarGrafica", viewModel);
-            //return RedirectToAction("Presupuestos", "VerDetalle", viewModel.NuevaTransaccion.PresupuestoId);
             return RedirectToAction("VerDetalle", "Presupuestos", new { id = viewModel.NuevaTransaccion.PresupuestoId });
         }
         
